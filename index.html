@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Portal</title>
+<style>
+body { margin:0; font-family: Arial; background:#f5f1e6; }
+.center { display:flex; justify-content:center; align-items:center; height:100vh; }
+.box { background:white; padding:30px; border-radius:12px; border:3px solid #0b2a4a; text-align:center; }
+input { padding:10px; margin:10px; border-radius:6px; border:2px solid #0b2a4a; }
+button { padding:10px 20px; background:#0b2a4a; color:white; border:none; border-radius:8px; cursor:pointer; }
+.sidebar { position:fixed; left:0; top:0; width:200px; height:100%; background:#0b2a4a; color:white; padding-top:20px; text-align:center; }
+.sidebar button { width:80%; margin:10px; background:#e6d8b5; color:black; }
+.main { margin-left:220px; padding:20px; }
+.card { background:white; padding:20px; margin-top:20px; border-radius:12px; border:3px solid #0b2a4a; }
+.progress { width:100%; height:20px; background:#ddd; border-radius:10px; }
+.bar { height:100%; width:0%; background:#0b2a4a; border-radius:10px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="center">
+  <div class="box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Enter Name"><br>
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;">
+  <div class="sidebar">
+    <h3>Portal</h3>
+    <button onclick="show('profile')">Profile</button>
+    <button onclick="show('assign')">Assignments</button>
+    <button onclick="show('att')">Attendance</button>
+    <button onclick="show('library')">Library</button>
+    <button onclick="show('news')">News</button>
+    <button onclick="show('payment')">Payment</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <div class="main">
+
+    <div id="profile" class="card">
+      <h2>Profile</h2>
+      <p id="userDisplay"></p>
+      <p>Course: BTech</p>
+    </div>
+
+    <div id="assign" class="card" style="display:none;">
+      <h2>Assignments</h2>
+      <input id="aName" placeholder="Assignment">
+      <input id="aDate" type="date">
+      <button onclick="addAssign()">Add</button>
+      <ul id="aList"></ul>
+    </div>
+
+    <div id="att" class="card" style="display:none;">
+      <h2>Attendance</h2>
+      <p>Web Dev (<span id="wPer">0%</span>)</p>
+      <input id="wT" type="number" placeholder="Total" oninput="update()">
+      <input id="wA" type="number" placeholder="Attended" oninput="update()">
+      <div class="progress"><div id="wBar" class="bar"></div></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div id="library" class="card" style="display:none;">
+      <h2>Library</h2>
+      <input id="bookName" placeholder="Book Name">
+      <button onclick="issueBook()">Issue Book</button>
+      <ul id="bookList"></ul>
+    </div>
+
+    <!-- NEWS -->
+    <div id="news" class="card" style="display:none;">
+      <h2>Campus News</h2>
+      <ul>
+        <li>📢 Mid Sem Exams start from 20th April</li>
+        <li>🎉 Tech Fest registrations open</li>
+        <li>📚 Library timing extended till 10 PM</li>
+      </ul>
+    </div>
+
+    <!-- PAYMENT -->
+    <div id="payment" class="card" style="display:none;">
+      <h2>Fees Payment</h2>
+      <p>Pending Fees: ₹50,000</p>
+      <button onclick="payFees()">Pay Now</button>
+      <p id="payStatus"></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- LOGOUT -->
+<div id="logoutPage" class="center" style="display:none;">
+  <div class="box">
+    <h2>You have been logged out</h2>
+    <button onclick="goLogin()">Login Again</button>
+  </div>
+</div>
+
+<script>
+function login(){
+  let name = document.getElementById("username").value;
+  if(name=="") return alert("Enter name");
+  document.getElementById("loginPage").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+  document.getElementById("userDisplay").innerText = "Name: "+name;
+}
+
+function logout(){
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("logoutPage").style.display="flex";
+}
+
+function goLogin(){
+  document.getElementById("logoutPage").style.display="none";
+  document.getElementById("loginPage").style.display="flex";
+}
+
+function show(id){
+  let sections = ["profile","assign","att","library","news","payment"];
+  sections.forEach(s => document.getElementById(s).style.display="none");
+  document.getElementById(id).style.display="block";
+}
+
+// Assignment
+let arr=[];
+function addAssign(){
+  let name=document.getElementById("aName").value;
+  let date=document.getElementById("aDate").value;
+  if(!name||!date) return alert("Fill all");
+  arr.push(name+" - "+date);
+  display();
+}
+function display(){
+  let list=document.getElementById("aList");
+  list.innerHTML="";
+  arr.forEach(x=>{
+    let li=document.createElement("li");
+    li.innerText=x;
+    list.appendChild(li);
+  });
+}
+
+// Attendance
+function update(){
+  let t=Number(document.getElementById("wT").value);
+  let a=Number(document.getElementById("wA").value);
+  if(!t||!a) return;
+  let p=((a/t)*100).toFixed(1);
+  document.getElementById("wPer").innerText=p+"%";
+  document.getElementById("wBar").style.width=p+"%";
+}
+
+// Library
+let books=[];
+function issueBook(){
+  let name=document.getElementById("bookName").value;
+  if(!name) return alert("Enter book name");
+  books.push(name);
+  let list=document.getElementById("bookList");
+  let li=document.createElement("li");
+  li.innerText=name+" issued";
+  list.appendChild(li);
+}
+
+// Payment
+function payFees(){
+  document.getElementById("payStatus").innerText="Payment Successful ✅";
+}
+</script>
+
+</body>
+</html>
